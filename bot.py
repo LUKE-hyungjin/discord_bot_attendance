@@ -4,6 +4,7 @@ import token
 import discord
 import os
 import asyncio
+import ast
 from datetime import datetime
 
 
@@ -20,8 +21,8 @@ class chatbot(discord.Client):
         await client.change_presence(status=discord.Status.online, activity=game)
 
         try:  # 에러 처리
-            with open("check.txt", "r+") as f:  # 파일 읽기 (만약 파일이 있을 경우)
-                print("Exist")  # 데이터를 불러오기
+            file = open("check.txt", "r+")  # 파일 읽기 (만약 파일이 있을 경우)
+            file.close()
 
         except FileNotFoundError:  # 파일이 없으면
             file = open("check.txt", "w")
@@ -32,18 +33,47 @@ class chatbot(discord.Client):
 
     # 봇에 메시지가 오면 수행 될 액션
 
+    def modify_txt():
+        with open("check.txt", "r") as f:  # 파일 읽기
+            line = f.readline()
+            modify_linefirst = line[1:-2] + ","
+            while line:
+                line = f.readline()
+                modify_line = line[1:-2] + ","
+                modify_linefirst = modify_linefirst + modify_line
+            final_line = modify_linefirst[:-2]
+            final_line = final_line.ljust(len(final_line)+1, '}')
+        final_line = final_line.rjust(len(final_line)+1, '{')
+        return final_line
+
     async def on_message(self, message):
-        date = datetime.today().strftime("%Y-%m-%d")
-        time = datetime.today().strftime("%H:%M")
 
         # SENDER가 BOT일 경우 반응을 하지 않도록 한다.
         if message.author.bot:
             return None
 
-        # message.content = message의 내용
+        with open("check.txt", "r") as f:  # 파일 읽기
+            line = chatbot.modify_txt()
+            line = ast.literal_eval(line)
+            print(line)
+            date = datetime.today().strftime("%Y-%m-%d")
+            time = list(line.values())
+            time = time[0][:10]
+            if date != time:
+                remove_items = list(line.items())
+                for remove_item in remove_items:
+                    author = remove_item[0]
+                    time = remove_item[1]
+                    date = time[:10]
+                    slice_time = time[-5:]
+                    now_time = datetime.today().strftime("%H:%M")
+                    hour = int(datetime.today().strftime("%H"))
+                    min = int(datetime.today().strftime("%M"))
+                    await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time}({hour}시간 {min}분)')
+            file = open("check.txt", "w")
+            file.close()
+
         if message.content == "!start":
-            # 현재 채널을 받아옴
-            channel = message.channel
             author = message.author.name
             # 답변 내용 구성
             # msg에 지정된 내용대로 메시지를 전송
@@ -51,25 +81,29 @@ class chatbot(discord.Client):
             msg = await message.channel.send(f'{author}님 지금부터 시작합니다.')
             await asyncio.sleep(5)
             await msg.delete()
-            text = f'{date}-{author}-{time}'
+            time = datetime.today().strftime("%Y-%m-%d-%H:%M")
+            text = {author: time}
             with open("check.txt", "a") as f:  # 파일을 만들기
                 f.write(f'{text}\n')
             return None
 
         if message.content == "!end":
             # 파일안에 오늘 시작한 사람이 있는지 확인
+            author = message.author.name
             with open("check.txt", "r") as f:  # 파일 읽기
-                name = f.read()
-                author = message.author.name
-                if author in name:
-                    line = f.readline()
-                    channel = message.channel
-                    # 답변 내용 구성
-                    end_time = datetime.today().strftime("%H:%M")
-                    text = f'{date}\n{author} : {time}~{end_time}'
-                    # msg에 지정된 내용대로 메시지를 전송
-                    await message.channel.send(f'{text}')
+                line = ast.literal_eval(f.readline())
+                print(line)
+                print(author)
+                if author in line:
+                    time = line.get(author)
+                    date = time[:10]
+                    slice_time = time[-5:]
+                    now_time = datetime.today().strftime("%H:%M")
+                    hour = int(datetime.today().strftime("%H"))
+                    min = int(datetime.today().strftime("%M"))
+                    await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time}({hour}시간 {min}분)')
                     return None
+
                 else:
                     await message.delete()
                     msg = await message.channel.send("오늘 시작하지 않았습니다. !start로 시작해주세요.")
