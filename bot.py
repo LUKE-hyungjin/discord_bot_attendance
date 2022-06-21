@@ -6,6 +6,7 @@ import os
 import asyncio
 import ast
 from datetime import datetime
+from pytz import timezone
 
 
 class chatbot(discord.Client):
@@ -63,7 +64,8 @@ class chatbot(discord.Client):
             with open("check.txt", "r") as f:  # 파일 읽기
                 line = chatbot.modify_txt()  # 한줄 딕셔너리 가져오기
                 line = ast.literal_eval(line)
-                date = datetime.today().strftime("%Y-%m-%d")
+                date = datetime.now(timezone('Asia/Seoul')
+                                    ).strftime("%Y-%m-%d")
                 time = list(line.values())
                 time = time[0][:10]
                 if date != time:
@@ -75,7 +77,8 @@ class chatbot(discord.Client):
                         date = time[:10]
                         slice_time = time[-5:]
                         last_time = datetime.strptime(slice_time, "%H:%M")
-                        now_time_string = datetime.today().strftime("%H:%M")
+                        now_time_string = datetime.now(
+                            timezone('Asia/Seoul')).strftime("%H:%M")
                         now_time = datetime.strptime(now_time_string, "%H:%M")
                         hour = str(now_time - last_time)[:-6]
                         min = str(now_time - last_time)[3:-3]
@@ -100,7 +103,8 @@ class chatbot(discord.Client):
                 if author in line:
                     pass
                 else:
-                    time = datetime.today().strftime("%Y-%m-%d-%H:%M")
+                    time = datetime.now(
+                        timezone('Asia/Seoul')).strftime("%Y-%m-%d-%H:%M")
                     text = {author: time}
                     with open("check.txt", "a") as f:  # 파일을 만들기
                         f.write(f'{text}\n')
@@ -119,7 +123,8 @@ class chatbot(discord.Client):
                         date = time[:10]
                         slice_time = time[-5:]
                         last_time = datetime.strptime(slice_time, "%H:%M")
-                        now_time_string = datetime.today().strftime("%H:%M")
+                        now_time_string = datetime.now(
+                            timezone('Asia/Seoul')).strftime("%H:%M")
                         now_time = datetime.strptime(now_time_string, "%H:%M")
                         hour = str(now_time - last_time)[:-6]
                         min = str(now_time - last_time)[3:-3]
@@ -154,8 +159,8 @@ if __name__ == "__main__":
     # 객체를 생성
     client = chatbot()
     # TOKEN 값을 통해 로그인하고 봇을 실행
-    # token_path = os.path.dirname(os.path.abspath(__file__))+'/token.txt'
-    # t = open(token_path, "r", encoding="utf-8")
-    # token = t.read()
-    # client.run(token)
-    client.run(os.environ['token'])
+    token_path = os.path.dirname(os.path.abspath(__file__))+'/token.txt'
+    t = open(token_path, "r", encoding="utf-8")
+    token = t.read()
+    client.run(token)
+    # client.run(os.environ['token'])
