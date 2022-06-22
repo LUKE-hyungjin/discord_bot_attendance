@@ -160,8 +160,8 @@ if __name__ == "__main__":
     # 객체를 생성
     client = chatbot()
     # TOKEN 값을 통해 로그인하고 봇을 실행
-    token_path = os.path.dirname(os.path.abspath(__file__))+'/token.txt'
-    t = open(token_path, "r", encoding="utf-8")
-    token = t.read()
-    client.run(token)
-    # client.run(os.environ['token'])
+    # token_path = os.path.dirname(os.path.abspath(__file__))+'/token.txt'
+    # t = open(token_path, "r", encoding="utf-8")
+    # token = t.read()
+    # client.run(token)
+    client.run(os.environ['token'])
