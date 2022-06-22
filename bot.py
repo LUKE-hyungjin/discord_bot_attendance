@@ -80,8 +80,8 @@ class chatbot(discord.Client):
                         now_time_string = datetime.now(
                             timezone('Asia/Seoul')).strftime("%H:%M")
                         now_time = datetime.strptime(now_time_string, "%H:%M")
-                        hour = str(now_time - last_time)[:-6]
-                        min = str(now_time - last_time)[3:-3]
+                        hour = str(now_time - last_time)[-8:-6]
+                        min = str(now_time - last_time)[-5:-3]
                         await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time_string}({hour}시간 {min}분)')
                     file = open("check.txt", "w")
                     file.close()
@@ -126,8 +126,9 @@ class chatbot(discord.Client):
                         now_time_string = datetime.now(
                             timezone('Asia/Seoul')).strftime("%H:%M")
                         now_time = datetime.strptime(now_time_string, "%H:%M")
-                        hour = str(now_time - last_time)[:-6]
-                        min = str(now_time - last_time)[3:-3]
+                        hour = str(now_time - last_time)[-8:-6]
+                        print(now_time - last_time)
+                        min = str(now_time - last_time)[-5:-3]
                         await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time_string}({hour}시간 {min}분)')
                         # 종료된 사람 txt파일에서 제거
                         with open("check.txt", "r+") as f:
@@ -159,8 +160,8 @@ if __name__ == "__main__":
     # 객체를 생성
     client = chatbot()
     # TOKEN 값을 통해 로그인하고 봇을 실행
-    # token_path = os.path.dirname(os.path.abspath(__file__))+'/token.txt'
-    # t = open(token_path, "r", encoding="utf-8")
-    # token = t.read()
-    # client.run(token)
-    client.run(os.environ['token'])
+    token_path = os.path.dirname(os.path.abspath(__file__))+'/token.txt'
+    t = open(token_path, "r", encoding="utf-8")
+    token = t.read()
+    client.run(token)
+    # client.run(os.environ['token'])
