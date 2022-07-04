@@ -29,10 +29,8 @@ class chatbot(discord.Client):
             file = open("check.txt", "w")
             file.close()
 
-        # 준비가 완료되면 콘솔 창에 "READY!"라고 표시
-        print("READY")
-
     # txt를 받아와서 한줄의 딕셔너리로 변환
+
     def modify_txt():
         with open("check.txt", "r") as f:  # 파일 읽기
             line = f.read().splitlines()  # 한줄씩 리스트에 넣기
@@ -59,42 +57,50 @@ class chatbot(discord.Client):
         if message.author.bot:
             return None
 
-        # 시간이 어제 날짜로 저장이 되어있으면 txt파일에 남아 있는 시간을 다 출력하고 txt파일을 초기화
-        try:
-            with open("check.txt", "r") as f:  # 파일 읽기
-                line = chatbot.modify_txt()  # 한줄 딕셔너리 가져오기
-                line = ast.literal_eval(line)
-                date = datetime.now(timezone('Asia/Seoul')
-                                    ).strftime("%Y-%m-%d")
-                time = list(line.values())
-                time = time[0][:10]
-                if date != time:
-                    remove_items = list(line.items())
-                    # 모든 줄 다 가지고 와서 출력
-                    for remove_item in remove_items:
-                        author = remove_item[0]
-                        time = remove_item[1]
-                        date = time[:10]
-                        slice_time = time[-5:]
-                        last_time = datetime.strptime(slice_time, "%H:%M")
-                        now_time_string = datetime.now(
-                            timezone('Asia/Seoul')).strftime("%H:%M")
-                        now_time = datetime.strptime(now_time_string, "%H:%M")
-                        hour = str(now_time - last_time)[-8:-6]
-                        min = str(now_time - last_time)[-5:-3]
-                        await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time_string}({hour}시간 {min}분)')
-                    file = open("check.txt", "w")
-                    file.close()
-        except:
-            pass
+        if str(message.channel) != '스터디룸':
+            msg = await message.channel.send('스터디룸 채널에서 사용해주세요')
+            await asyncio.sleep(5)
+            await message.delete()
+            await msg.delete()
+            return None
 
         if message.content == "!start":
+            print(message.channel)
+            # 시간이 어제 날짜로 저장이 되어있으면 txt파일에 남아 있는 시간을 다 출력하고 txt파일을 초기화
+            try:
+                with open("check.txt", "r") as f:  # 파일 읽기
+                    line = chatbot.modify_txt()  # 한줄 딕셔너리 가져오기
+                    line = ast.literal_eval(line)
+                    date = datetime.now(timezone('Asia/Seoul')
+                                        ).strftime("%Y-%m-%d")
+                    time = list(line.values())
+                    time = time[0][:10]
+                    if date != time:
+                        remove_items = list(line.items())
+                        # 모든 줄 다 가지고 와서 출력
+                        for remove_item in remove_items:
+                            author = remove_item[0]
+                            time = remove_item[1]
+                            date = time[:10]
+                            slice_time = time[-5:]
+                            last_time = datetime.strptime(slice_time, "%H:%M")
+                            now_time_string = datetime.now(
+                                timezone('Asia/Seoul')).strftime("%H:%M")
+                            now_time = datetime.strptime(
+                                now_time_string, "%H:%M")
+                            hour = str(now_time - last_time)[-8:-6]
+                            min = str(now_time - last_time)[-5:-3]
+                            await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time_string}({hour}시간 {min}분)')
+                        file = open("check.txt", "w")
+                        file.close()
+            except:
+                pass
             author = message.author.name
             # 답변 내용 구성
             # msg에 지정된 내용대로 메시지를 전송
-            await message.delete()
             msg = await message.channel.send(f'{author}님 지금부터 시작합니다.')
             await asyncio.sleep(5)
+            await message.delete()
             await msg.delete()
             with open("check.txt", "r") as f:  # 파일 읽기
                 line = chatbot.modify_txt()
@@ -127,7 +133,6 @@ class chatbot(discord.Client):
                             timezone('Asia/Seoul')).strftime("%H:%M")
                         now_time = datetime.strptime(now_time_string, "%H:%M")
                         hour = str(now_time - last_time)[-8:-6]
-                        print(now_time - last_time)
                         min = str(now_time - last_time)[-5:-3]
                         await message.channel.send(f'{date}\n{author} : {slice_time}~{now_time_string}({hour}시간 {min}분)')
                         # 종료된 사람 txt파일에서 제거
@@ -135,22 +140,22 @@ class chatbot(discord.Client):
                             new_f = f.readlines()
                             f.seek(0)
                             for line in new_f:
-                                if "이형진" not in line:
+                                if author not in line:
                                     f.write(line)
                             f.truncate()
 
                         return None
                     else:
-                        await message.delete()
                         msg = await message.channel.send("오늘 시작하지 않았습니다. !start로 시작해주세요.")
                         await asyncio.sleep(5)
+                        await message.delete()
                         await msg.delete()
                         return None
 
             except:
-                await message.delete()
                 msg = await message.channel.send("오늘 시작하지 않았습니다. !start로 시작해주세요.")
                 await asyncio.sleep(5)
+                await message.delete()
                 await msg.delete()
                 return None
 
