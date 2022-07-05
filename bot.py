@@ -57,15 +57,14 @@ class chatbot(discord.Client):
         if message.author.bot:
             return None
 
-        if str(message.channel) != '스터디룸':
-            msg = await message.channel.send('스터디룸 채널에서 사용해주세요')
-            await asyncio.sleep(5)
-            await message.delete()
-            await msg.delete()
-            return None
-
         if message.content == "!start":
-            print(message.channel)
+
+            if str(message.channel) != '스터디룸':
+                msg = await message.channel.send('스터디룸 채널에서 사용해주세요')
+                await asyncio.sleep(5)
+                await message.delete()
+                await msg.delete()
+                return None
             # 시간이 어제 날짜로 저장이 되어있으면 txt파일에 남아 있는 시간을 다 출력하고 txt파일을 초기화
             try:
                 with open("check.txt", "r") as f:  # 파일 읽기
@@ -117,6 +116,12 @@ class chatbot(discord.Client):
             return None
 
         if message.content == "!end":
+            if str(message.channel) != '스터디룸':
+                msg = await message.channel.send('스터디룸 채널에서 사용해주세요')
+                await asyncio.sleep(5)
+                await message.delete()
+                await msg.delete()
+                return None
             # 파일안에 오늘 시작한 사람이 있는지 확인
             author = message.author.name
             try:
