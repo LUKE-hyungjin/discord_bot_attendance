@@ -94,7 +94,7 @@ class chatbot(discord.Client):
                         file.close()
             except:
                 pass
-            author = message.author.name
+            author = message.author.display_name
             # 답변 내용 구성
             # msg에 지정된 내용대로 메시지를 전송
             msg = await message.channel.send(f'{author}님 지금부터 시작합니다.')
@@ -123,7 +123,7 @@ class chatbot(discord.Client):
                 await msg.delete()
                 return None
             # 파일안에 오늘 시작한 사람이 있는지 확인
-            author = message.author.name
+            author = message.author.display_name
             try:
                 with open("check.txt", "r") as f:  # 파일 읽기
                     line = chatbot.modify_txt()
